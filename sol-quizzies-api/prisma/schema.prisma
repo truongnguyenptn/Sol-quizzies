@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Account {
+  id                String  @id
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model User {
+  id            String    @id
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+}
+
+model Answer {
+  id         String   @id @default(uuid())
+  userId     String
+  questionId String
+  userAnswer String
+  attemptId  String
+  isCorrect  Boolean?
+  question   Question @relation(fields: [questionId], references: [id], map: "Answer_questionId_fkey")
+  attempt    Attempt  @relation(fields: [attemptId], references: [id], map: "Answer_attemptId_fkey")
+
+  @@index([questionId])
+}
+
+model Attempt {
+  id                String    @id @default(uuid())
+  gameId            String
+  userId            String
+  attemptCount      Int       @default(0)
+  score             Int       @default(0)
+  isFinished        Boolean?
+  accuracy          Float?
+  percentageCorrect Float?
+  Answer            Answer[]
+  timeStarted       DateTime?
+  timeEnded         DateTime?
+
+  @@index([gameId])
+}
+
+model Game {
+  id          String        @id @default(uuid())
+  userId      String
+  timeStarted DateTime
+  topic       String
+  timeEnded   DateTime?
+  gameType    Game_gameType
+  Question    Question[]
+
+  @@index([userId])
+}
+
+model Question {
+  id           String                @id @default(uuid())
+  question     String
+  answer       String
+  gameId       String
+  options      Json?
+  questionType Question_questionType
+  score        Int                   @default(0)
+
+  Game Game @relation(fields: [gameId], references: [id], map: "Question_gameId_fkey")
+
+  Answer Answer[]
+
+  @@index([gameId])
+}
+
+model Session {
+  id           String   @id
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  @@index([userId])
+}
+
+model topic_count {
+  id    String @id
+  topic String @unique
+  count Int
+}
+
+enum Game_gameType {
+  mcq
+  open_ended
+}
+
+enum Question_questionType {
+  mcq
+  open_ended
+}

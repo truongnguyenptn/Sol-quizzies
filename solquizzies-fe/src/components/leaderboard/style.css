@@ -1,0 +1,6 @@
+.outline-text {
+    background: -webkit-linear-gradient(45deg, #8C01FA, #19FB9B );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+  
