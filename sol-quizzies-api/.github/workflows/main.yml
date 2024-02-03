@@ -3,6 +3,8 @@ name: NestJS-Backend:CI
 on:
   push:
     branches: ['master']
+    paths: 
+      - 'sol-quizzies-api/**'
   # Setting an environment variable with the value of a configuration variable
 
 
